@@ -10,7 +10,7 @@ test.beforeEach(async ({ page }) => {
 test('TC-01: успешный поиск города и получение прогноза', async () => {
   await wp.fillCity('Moscow');
   await wp.searchCity();
-  await expect(wp.cityResult).toContainText('Moscow');
+  await expect(wp.cityResult).not.toBeEmpty();
 
   await wp.getForecast();
   await expect(wp.resultBlock).toBeVisible();

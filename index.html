@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <title>Погодный сервис</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <main class="app">
+    <h1>Погодный сервис (Open-Meteo)</h1>
+
+    <section class="block">
+      <label for="city">Название города</label>
+      <input id="city" data-testid="city-input" type="text" />
+      <button id="search" data-testid="search-button">Найти город</button>
+      <p id="city-result" data-testid="city-coordinates"></p>
+    </section>
+
+    <section class="block">
+      <label for="lat">Широта (latitude)</label>
+      <input id="lat" data-testid="lat-input" type="text" />
+
+      <label for="lon">Долгота (longitude)</label>
+      <input id="lon" data-testid="lon-input" type="text" />
+
+      <button id="forecast" data-testid="forecast-button">Получить прогноз</button>
+    </section>
+
+    <section class="block" data-testid="result-block" hidden>
+      <p>Температура: <span data-testid="temperature"></span> °C</p>
+    </section>
+
+    <p id="error" data-testid="error-message" class="error" hidden></p>
+  </main>
+  <script src="scripts.js"></script>
+</body>
+</html>

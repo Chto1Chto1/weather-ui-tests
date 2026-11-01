@@ -1,0 +1,9 @@
+body { font-family: system-ui, sans-serif; background: #f4f6fb; margin: 0; padding: 2rem; }
+.app { max-width: 520px; margin: 0 auto; background: #fff; padding: 2rem; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,.08); }
+h1 { font-size: 1.3rem; margin-bottom: 1.5rem; }
+.block { display: flex; flex-direction: column; gap: .5rem; margin-bottom: 1.5rem; }
+input { padding: .6rem; border: 1px solid #ccd; border-radius: 8px; font-size: 1rem; }
+button { padding: .6rem 1rem; border: none; border-radius: 8px; background: #3b6cf6; color: #fff; cursor: pointer; font-size: 1rem; }
+button:disabled { background: #aab; cursor: not-allowed; }
+.error { color: #c00; font-weight: 600; }
+[hidden] { display: none !important; }

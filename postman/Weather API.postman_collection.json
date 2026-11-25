@@ -1,0 +1,482 @@
+{
+  "info": {
+    "_postman_id": "b75ae3b4-cca7-48c0-be41-37f71ce0121a",
+    "name": "Weather API (Open-Meteo)",
+    "description": "ЛР4. Ручное тестирование Open-Meteo Geocoding API и Forecast API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "01 Geocoding — поиск города Moscow",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 200\", function () { pm.response.to.have.status(200); });",
+              "pm.test(\"Найден город с координатами\", function () { const b = pm.response.json(); pm.expect(b.results).to.be.an(\"array\").that.is.not.empty; pm.expect(b.results[0].latitude).to.be.a(\"number\"); pm.expect(b.results[0].longitude).to.be.a(\"number\"); });",
+              "pm.test(\"Время ответа меньше 2000 мс\", function () { pm.expect(pm.response.responseTime).to.be.below(2000); });"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{geo_url}}?name=Moscow&count=1&language=ru&format=json",
+          "host": [
+            "{{geo_url}}"
+          ],
+          "query": [
+            {
+              "key": "name",
+              "value": "Moscow"
+            },
+            {
+              "key": "count",
+              "value": "1"
+            },
+            {
+              "key": "language",
+              "value": "ru"
+            },
+            {
+              "key": "format",
+              "value": "json"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "02 Geocoding — несуществующий город",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 200\", function () { pm.response.to.have.status(200); });",
+              "pm.test(\"Результаты отсутствуют\", function () { pm.expect(pm.response.json().results).to.be.undefined; });",
+              "pm.test(\"Время ответа меньше 2000 мс\", function () { pm.expect(pm.response.responseTime).to.be.below(2000); });"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{geo_url}}?name=Xyznonexistent123&count=1",
+          "host": [
+            "{{geo_url}}"
+          ],
+          "query": [
+            {
+              "key": "name",
+              "value": "Xyznonexistent123"
+            },
+            {
+              "key": "count",
+              "value": "1"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "03 Geocoding — без параметра name",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 400\", function () { pm.response.to.have.status(400); });",
+              "pm.test(\"Время ответа меньше 2000 мс\", function () { pm.expect(pm.response.responseTime).to.be.below(2000); });"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{geo_url}}?count=1",
+          "host": [
+            "{{geo_url}}"
+          ],
+          "query": [
+            {
+              "key": "count",
+              "value": "1"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "04 Forecast — текущая температура (без API-ключа)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 200\", function () { pm.response.to.have.status(200); });",
+              "pm.test(\"Есть текущая температура в °C\", function () { const b = pm.response.json(); pm.expect(b.current.temperature_2m).to.be.a(\"number\"); pm.expect(b.current_units.temperature_2m).to.eql(\"°C\"); });",
+              "pm.test(\"Время ответа меньше 2000 мс\", function () { pm.expect(pm.response.responseTime).to.be.below(2000); });"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{forecast_url}}?latitude=55.7558&longitude=37.6173&current=temperature_2m",
+          "host": [
+            "{{forecast_url}}"
+          ],
+          "query": [
+            {
+              "key": "latitude",
+              "value": "55.7558"
+            },
+            {
+              "key": "longitude",
+              "value": "37.6173"
+            },
+            {
+              "key": "current",
+              "value": "temperature_2m"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "05 Forecast — почасовой прогноз на 1 день",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 200\", function () { pm.response.to.have.status(200); });",
+              "pm.test(\"24 почасовых значения\", function () { const b = pm.response.json(); pm.expect(b.hourly.time).to.have.lengthOf(24); pm.expect(b.hourly.temperature_2m).to.have.lengthOf(24); });",
+              "pm.test(\"Время ответа меньше 2000 мс\", function () { pm.expect(pm.response.responseTime).to.be.below(2000); });"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{forecast_url}}?latitude=55.7558&longitude=37.6173&hourly=temperature_2m&forecast_days=1",
+          "host": [
+            "{{forecast_url}}"
+          ],
+          "query": [
+            {
+              "key": "latitude",
+              "value": "55.7558"
+            },
+            {
+              "key": "longitude",
+              "value": "37.6173"
+            },
+            {
+              "key": "hourly",
+              "value": "temperature_2m"
+            },
+            {
+              "key": "forecast_days",
+              "value": "1"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "06 Forecast — суточный прогноз, Europe/Moscow",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 200\", function () { pm.response.to.have.status(200); });",
+              "pm.test(\"Часовой пояс и 7 дней прогноза\", function () { const b = pm.response.json(); pm.expect(b.timezone).to.eql(\"Europe/Moscow\"); pm.expect(b.daily.time).to.have.lengthOf(7); });",
+              "pm.test(\"Время ответа меньше 2000 мс\", function () { pm.expect(pm.response.responseTime).to.be.below(2000); });"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{forecast_url}}?latitude=55.7558&longitude=37.6173&daily=temperature_2m_max&timezone=Europe/Moscow",
+          "host": [
+            "{{forecast_url}}"
+          ],
+          "query": [
+            {
+              "key": "latitude",
+              "value": "55.7558"
+            },
+            {
+              "key": "longitude",
+              "value": "37.6173"
+            },
+            {
+              "key": "daily",
+              "value": "temperature_2m_max"
+            },
+            {
+              "key": "timezone",
+              "value": "Europe/Moscow"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "07 Forecast — широта на границе -90",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 200\", function () { pm.response.to.have.status(200); });",
+              "pm.test(\"Время ответа меньше 2000 мс\", function () { pm.expect(pm.response.responseTime).to.be.below(2000); });"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{forecast_url}}?latitude=-90&longitude=0&current=temperature_2m",
+          "host": [
+            "{{forecast_url}}"
+          ],
+          "query": [
+            {
+              "key": "latitude",
+              "value": "-90"
+            },
+            {
+              "key": "longitude",
+              "value": "0"
+            },
+            {
+              "key": "current",
+              "value": "temperature_2m"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "08 Forecast — широта вне диапазона 91",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 400\", function () { pm.response.to.have.status(400); });",
+              "pm.test(\"Ответ содержит error=true и reason\", function () { const b = pm.response.json(); pm.expect(b.error).to.eql(true); pm.expect(b.reason).to.be.a(\"string\"); });",
+              "pm.test(\"Время ответа меньше 2000 мс\", function () { pm.expect(pm.response.responseTime).to.be.below(2000); });"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{forecast_url}}?latitude=91&longitude=0",
+          "host": [
+            "{{forecast_url}}"
+          ],
+          "query": [
+            {
+              "key": "latitude",
+              "value": "91"
+            },
+            {
+              "key": "longitude",
+              "value": "0"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "09 Forecast — долгота вне диапазона 181",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 400\", function () { pm.response.to.have.status(400); });",
+              "pm.test(\"Ответ содержит error=true и reason\", function () { const b = pm.response.json(); pm.expect(b.error).to.eql(true); pm.expect(b.reason).to.be.a(\"string\"); });",
+              "pm.test(\"Время ответа меньше 2000 мс\", function () { pm.expect(pm.response.responseTime).to.be.below(2000); });"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{forecast_url}}?latitude=0&longitude=181",
+          "host": [
+            "{{forecast_url}}"
+          ],
+          "query": [
+            {
+              "key": "latitude",
+              "value": "0"
+            },
+            {
+              "key": "longitude",
+              "value": "181"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "10 Forecast — нечисловая широта abc",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 400\", function () { pm.response.to.have.status(400); });",
+              "pm.test(\"Ответ содержит error=true и reason\", function () { const b = pm.response.json(); pm.expect(b.error).to.eql(true); pm.expect(b.reason).to.be.a(\"string\"); });",
+              "pm.test(\"Время ответа меньше 2000 мс\", function () { pm.expect(pm.response.responseTime).to.be.below(2000); });"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{forecast_url}}?latitude=abc&longitude=37.6173",
+          "host": [
+            "{{forecast_url}}"
+          ],
+          "query": [
+            {
+              "key": "latitude",
+              "value": "abc"
+            },
+            {
+              "key": "longitude",
+              "value": "37.6173"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "11 Forecast — без параметра longitude",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 400\", function () { pm.response.to.have.status(400); });",
+              "pm.test(\"Ответ содержит error=true и reason\", function () { const b = pm.response.json(); pm.expect(b.error).to.eql(true); pm.expect(b.reason).to.be.a(\"string\"); });",
+              "pm.test(\"Время ответа меньше 2000 мс\", function () { pm.expect(pm.response.responseTime).to.be.below(2000); });"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{forecast_url}}?latitude=55.7558",
+          "host": [
+            "{{forecast_url}}"
+          ],
+          "query": [
+            {
+              "key": "latitude",
+              "value": "55.7558"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "12 Forecast — некорректный timezone",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 400\", function () { pm.response.to.have.status(400); });",
+              "pm.test(\"Ответ содержит error=true и reason\", function () { const b = pm.response.json(); pm.expect(b.error).to.eql(true); pm.expect(b.reason).to.be.a(\"string\"); });",
+              "pm.test(\"Время ответа меньше 2000 мс\", function () { pm.expect(pm.response.responseTime).to.be.below(2000); });"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{forecast_url}}?latitude=55.7558&longitude=37.6173&daily=temperature_2m_max&timezone=Mars/Olympus",
+          "host": [
+            "{{forecast_url}}"
+          ],
+          "query": [
+            {
+              "key": "latitude",
+              "value": "55.7558"
+            },
+            {
+              "key": "longitude",
+              "value": "37.6173"
+            },
+            {
+              "key": "daily",
+              "value": "temperature_2m_max"
+            },
+            {
+              "key": "timezone",
+              "value": "Mars/Olympus"
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "variable": [
+    {
+      "key": "geo_url",
+      "value": "https://geocoding-api.open-meteo.com/v1/search"
+    },
+    {
+      "key": "forecast_url",
+      "value": "https://api.open-meteo.com/v1/forecast"
+    }
+  ]
+}
